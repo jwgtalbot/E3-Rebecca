@@ -47,7 +47,7 @@ knowledgebase.map(sentence => {
 	var fp = retina.getFingerprint(sentence);
 	fingerprints[sentence] = fp;
 });
-var matchThreshold = 0.7;
+var matchThreshold = 0.5;
 
 //Bot on
 bot.on('contactRelationUpdate', function (message) {
@@ -78,27 +78,28 @@ bot.dialog('/', function (session) {
 
 	var messageText = session.message.text;
 	var messageFP = retina.getFingerprint(messageText);
-	var matches = knowledgebase.filter(sentence => {
-		var fp = fingerprints[sentence];
-		var metric = retina.compare(messageFP, fp);
-		console.log('retina.compare("' + messageText + '", "' + sentence + '") =>' + metric);
-		return metric > matchThreshold;
-	});
+	var matches = knowledgebase
+		.map(sentence => {
+				var fp = fingerprints[sentence];
+				var metric = retina.compare(messageFP, fp);
+				console.log('retina.compare("' + messageText + '", "' + sentence + '") =>' + metric);
+				return {text: sentence, fp: fp, metric: metric};
+			}).filter(sentence => sentence.metric > matchThreshold).sort((a, b) => a.metric < b.metric);
 	console.log('"' + messageText + '"' + ' => found matched: ' + matches.length);
 	matches.sort();
 	if (matches.length > 0) {
 		if (matches.length === 1) {
 			matches.forEach(sentence => {
-				console.log('you meant: ' + sentence);
-				session.send('you meant: ' + sentence);
+				console.log('you meant: ' + sentence.text);
+				session.send('you meant: ' + sentence.text);
 			});
 		}
 		else {
 			console.log('which did you mean:');
 			session.send('which did you mean:');
 			matches.forEach(sentence => {
-				console.log(sentence);
-				session.send(sentence);
+				console.log(sentence.text);
+				session.send(sentence.text);
 			});
 		}
 	}
