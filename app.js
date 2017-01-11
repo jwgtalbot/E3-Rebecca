@@ -1,12 +1,20 @@
 var restify = require('restify');
 var builder = require('botbuilder');
 var retinaSDK = require('retinasdk');
+var fs = require('fs');
 //=========================================================
 // Bot Setup
 //=========================================================
 // Setup Restify Server
-var server = restify.createServer();
-server.listen(process.env.port || process.env.PORT || 8080, function () {
+
+var server = restify.createServer({
+    certificate: fs.readFileSync('/home/e3/git/E3-Rebecca/s43.crt'),
+    key: fs.readFileSync('/home/e3/git/E3-Rebecca/s43.key'),
+    name: 'E3 Rebecca'
+
+
+});
+server.listen(process.env.port || process.env.PORT || 8443, function () {
    console.log('%s listening to %s', server.name, server.url);
 });
 // Create chat bot
