@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+  <head>
+	<title>Retina API</title>
+	<style>
+	  * { margin: 0; padding: 0; box-sizing: border-box; }
+	  body { font: 13px Helvetica, Arial; }
+	  form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+	  form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+	  form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+	  #messages { list-style-type: none; margin: 0; padding: 0; }
+	  #messages li { padding: 5px 10px; }
+	  #messages li:nth-child(odd) { background: #eee; }
+	</style>
+	<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+	<script src="scripts/retina-sdk-1.0.js"></script>
+	<script>
+		var retinaApiKey = "2ce074b0-d7c7-11e6-a057-97f4c970893c";
+		var liteClient = retinaSDK.LiteClient(retinaApiKey);
+		setTimeout(function() {
+			var sentence1 = "Please open an SN ticket"
+			var sentence1a = "Please close the SN ticket"
+			var sentence1b = "Please open an service now ticket"
+			var sentence1c = "Please open an servicenow ticket"
+			var sentence2 = "Could you create an SN ticket";
+			var sentence2a = "Could you destroy an SN ticket";
+			var sentence3 = "What is the weather like in Pune";
+			var sentence1FP = liteClient.getFingerprint(sentence1);
+			var sentence1aFP = liteClient.getFingerprint(sentence1a);
+			var sentence1bFP = liteClient.getFingerprint(sentence1b);
+			var sentence1cFP = liteClient.getFingerprint(sentence1c);
+			var sentence2FP = liteClient.getFingerprint(sentence2);
+			var sentence2aFP = liteClient.getFingerprint(sentence2a);
+			var sentence3FP = liteClient.getFingerprint(sentence3);
+			$('#lines').append('<li>').append("liteClient.getKeywords(sentence1) => " + liteClient.getKeywords(sentence1));
+			$('#lines').append('<li>').append("liteClient.getKeywords(sentence1a) => " + liteClient.getKeywords(sentence1a));
+			$('#lines').append('<li>').append("liteClient.getKeywords(sentence1b) => " + liteClient.getKeywords(sentence1b));
+			$('#lines').append('<li>').append("liteClient.getKeywords(sentence1c) => " + liteClient.getKeywords(sentence1c));
+			$('#lines').append('<li>').append("liteClient.getKeywords(sentence2) => " + liteClient.getKeywords(sentence2));
+			$('#lines').append('<li>').append("liteClient.getKeywords(sentence2a) => " + liteClient.getKeywords(sentence2a));
+			$('#lines').append('<li>').append("liteClient.getKeywords(sentence3) => " + liteClient.getKeywords(sentence3));
+			$('#lines').append('<li>').append("liteClient.compare(sentence1FP, sentence2FP) => " + liteClient.compare(sentence1FP, sentence2FP));
+			$('#lines').append('<li>').append("liteClient.compare(sentence1FP, sentence1aFP) => " + liteClient.compare(sentence1FP, sentence1aFP));
+			$('#lines').append('<li>').append("liteClient.compare(sentence1FP, sentence1bFP) => " + liteClient.compare(sentence1FP, sentence1bFP));
+			$('#lines').append('<li>').append("liteClient.compare(sentence1FP, sentence1cFP) => " + liteClient.compare(sentence1FP, sentence1cFP));
+			$('#lines').append('<li>').append("liteClient.compare(sentence2FP, sentence2aFP) => " + liteClient.compare(sentence2FP, sentence2aFP));
+			$('#lines').append('<li>').append("liteClient.compare(sentence1FP, sentence3FP) => " + liteClient.compare(sentence1FP, sentence3FP));
+			$('#lines').append('<li>').append("liteClient.compare(sentence2FP, sentence3FP) => " + liteClient.compare(sentence2FP, sentence3FP));
+		}, 1000);
+	 </script>
+  </head>
+  <body>
+	<ul id="lines"></ul>
+  </body>
+</html>
