@@ -10,6 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "botbuilder": "^3.5.3",
-    "restify": "^4.3.0"
+    "nodemon": "^1.11.0",
+    "restify": "^4.3.0",
+    "retinasdk": "^1.0.7"
   }
 }
