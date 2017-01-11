@@ -39,6 +39,9 @@ var knowledgebase = [
 "reject request",
 "close sn ticket",
 "cancel sn ticket",
+"open cmp request",
+"approve cmp request",
+"reject cmp request",
 ];
 
 // Model paramters
@@ -74,40 +77,57 @@ String.prototype.contains = function(content){
   return this.indexOf(content) !== -1;
 }
 
+var pending = null;
+
 bot.dialog('/', function (session) {
 
 	var messageText = session.message.text;
-	var messageFP = retina.getFingerprint(messageText);
-	var matches = knowledgebase
-		.map(sentence => {
-				var fp = fingerprints[sentence];
-				var metric = retina.compare(messageFP, fp);
-				console.log('retina.compare("' + messageText + '", "' + sentence + '") =>' + metric);
-				return {text: sentence, fp: fp, metric: metric};
-			}).filter(sentence => sentence.metric > matchThreshold).sort((a, b) => a.metric < b.metric);
-	console.log('"' + messageText + '"' + ' => found matched: ' + matches.length);
-	matches.sort();
-	if (matches.length > 0) {
-		if (matches.length === 1) {
-			matches.forEach(sentence => {
-				console.log('you meant: ' + sentence.text);
-				session.send('you meant: ' + sentence.text);
-			});
+
+	var choice = parseInt(messageText);
+	if (pending == null || isNaN(choice)) {
+		var messageFP = retina.getFingerprint(messageText);
+		var matches = knowledgebase
+			.map(sentence => {
+					var fp = fingerprints[sentence];
+					var metric = retina.compare(messageFP, fp);
+					console.log('retina.compare("' + messageText + '", "' + sentence + '") =>' + metric);
+					return {text: sentence, fp: fp, metric: metric};
+				}).filter(sentence => sentence.metric > matchThreshold).sort((a, b) => a.metric < b.metric);
+		console.log('"' + messageText + '"' + ' => found matched: ' + matches.length);
+		matches.sort().splice(3, matches.length - 3);
+		if (matches.length > 0) {
+			if (matches.length === 1) {
+				matches.forEach(sentence => {
+					console.log('you meant: ' + sentence.text);
+					session.send('you meant: ' + sentence.text);
+				});
+			}
+			else {
+				console.log('which did you mean:');
+				var response = 'which did you mean?\n';
+				var index = 1;
+				pending = [];
+				matches.forEach(sentence => {
+					console.log(sentence.text);
+					response += index + '. ' + sentence.text + '\n';
+					pending.push(sentence.text);
+					index++;
+				});
+				session.send(response);
+			}
+		}
+		else if(messageText.toLowerCase().contains('hello')) {
+		  	session.send(`Hey, How are you?`);
+		}
+		else if(messageText.toLowerCase().contains('help')) {
+				session.send(`How can I help you?`);
 		}
 		else {
-			console.log('which did you mean:');
-			session.send('which did you mean:');
-			matches.forEach(sentence => {
-				console.log(sentence.text);
-				session.send(sentence.text);
-			});
+			session.send(`Sorry I don't understand you...`);
 		}
 	}
-	else if(messageText.toLowerCase().contains('hello')){
-      session.send(`Hey, How are you?`);
-      }else if(messageText.toLowerCase().contains('help')){
-        session.send(`How can I help you?`);
-      }else{
-        session.send(`Sorry I don't understand you...`);
-      }
+	else {
+		session.send('you chose: ' + pending[choice-1]);
+		pending = null;
+	}
 });
